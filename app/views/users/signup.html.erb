@@ -1,0 +1,36 @@
+<div class="auth-page">
+  <div class="auth-card">
+
+<div class="auth-header">
+  <h1>Create Account</h1>
+  <p>Join Product Listing and start adding products</p>
+</div>
+
+<%= form_with model: @user, url: "/signup", method: :post, class: "auth-form" do |form| %>
+
+  <div class="form-group">
+    <%= form.label :name, "Full Name" %>
+    <%= form.text_field :name, placeholder: "Enter your name", required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :email, "Email Address" %>
+    <%= form.email_field :email, placeholder: "Enter your email", required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :password, "Password" %>
+    <%= form.password_field :password, placeholder: "Create a password", required: true %>
+  </div>
+
+  <%= form.submit "Create Account", class: "auth-button" %>
+
+<% end %>
+
+<div class="auth-footer">
+  <p>Already have an account?</p>
+  <%= link_to "Login here", "/login" %>
+</div>
+
+  </div>
+</div>

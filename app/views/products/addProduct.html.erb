@@ -1,0 +1,658 @@
+<div class="add-product-page">
+
+  <div class="add-product-card">
+
+<div class="page-header">
+  <span class="header-icon">＋</span>
+
+  <div>
+    <h1>Add Product</h1>
+    <p>Create a new product and upload its images.</p>
+  </div>
+</div>
+
+
+<%= form_with model: @product,
+              url: "/products",
+              method: :post,
+              multipart: true,
+              data: { turbo: false },
+              id: "productForm" do |form| %>
+
+  <!-- Product Name -->
+  <div class="form-group">
+
+    <%= form.label :name, "Product Name" %>
+
+    <%= form.text_field :name,
+          placeholder: "Enter product name",
+          autocomplete: "off",
+          required: true %>
+
+  </div>
+
+
+  <!-- Description -->
+  <div class="form-group">
+
+    <%= form.label :description, "Description" %>
+
+    <%= form.text_area :description,
+          placeholder: "Describe your product...",
+          rows: 5,
+          required: true %>
+
+  </div>
+
+
+  <!-- Price + Quantity -->
+  <div class="form-row">
+
+    <div class="form-group">
+
+      <%= form.label :price, "Price (₹)" %>
+
+      <%= form.number_field :price,
+            step: "0.01",
+            min: "0",
+            placeholder: "0.00",
+            required: true %>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <%= form.label :quantity, "Quantity" %>
+
+      <%= form.number_field :quantity,
+            min: "1",
+            placeholder: "0",
+            required: true %>
+
+    </div>
+
+  </div>
+
+
+  <!-- Images -->
+  <div class="form-group">
+
+    <%= form.label :images, "Product Images" %>
+
+    <div class="image-upload-box">
+
+      <div class="upload-icon">
+        ↑
+      </div>
+
+      <h3>Upload product images</h3>
+
+      <p>Select one or multiple images</p>
+
+      <%= form.file_field :images,
+            multiple: true,
+            accept: "image/*",
+            id: "productImages",
+            required: true %>
+
+      <label for="productImages" class="choose-images-btn">
+        Choose Images
+      </label>
+
+      <p id="fileCount" class="file-count">
+        No images selected
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- Selected Images Preview -->
+  <div id="previewContainer" class="preview-container"></div>
+
+
+  <!-- Upload Progress -->
+  <div id="uploadProgressSection" class="upload-progress-section">
+
+    <div class="progress-header">
+
+      <span id="uploadStatus">
+        Uploading images...
+      </span>
+
+      <span id="uploadPercentage">
+        0%
+      </span>
+
+    </div>
+
+    <div class="progress-bar">
+
+      <div id="progressBar"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Submit -->
+  <button type="submit" id="submitButton" class="add-product-btn">
+
+    <span id="buttonText">
+      Add Product
+    </span>
+
+    <span id="buttonLoader" class="button-loader"></span>
+
+  </button>
+
+<% end %>
+
+
+  </div>
+
+</div>
+
+<style>
+
+  .add-product-page {
+    min-height: calc(100vh - 70px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 50px 20px;
+    background: #ffffff;
+  }
+
+
+  .add-product-card {
+    width: 100%;
+    max-width: 720px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+  }
+
+
+  .page-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 35px;
+  }
+
+
+  .header-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #111111;
+    color: #ffffff;
+
+    font-size: 28px;
+    font-weight: 300;
+  }
+
+
+  .page-header h1 {
+    margin: 0;
+    font-size: 30px;
+    color: #111111;
+  }
+
+
+  .page-header p {
+    margin: 5px 0 0;
+    color: #777777;
+    font-size: 14px;
+  }
+
+
+  .form-group {
+    margin-bottom: 25px;
+  }
+
+
+  .form-group label {
+    display: block;
+    margin-bottom: 9px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #222222;
+  }
+
+
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 13px 15px;
+
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+
+    font-size: 15px;
+    color: #111111;
+
+    background: #ffffff;
+
+    outline: none;
+
+    transition: 0.2s;
+  }
+
+
+  .form-group textarea {
+    resize: vertical;
+  }
+
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: #111111;
+
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+  }
+
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+
+  .image-upload-box {
+    border: 2px dashed #cccccc;
+    border-radius: 14px;
+
+    padding: 35px 20px;
+
+    text-align: center;
+
+    transition: 0.2s;
+  }
+
+
+  .image-upload-box:hover {
+    border-color: #111111;
+    background: #fafafa;
+  }
+
+
+  .upload-icon {
+    width: 55px;
+    height: 55px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #111111;
+    color: #ffffff;
+
+    font-size: 25px;
+  }
+
+
+  .image-upload-box h3 {
+    margin: 0;
+    color: #111111;
+    font-size: 17px;
+  }
+
+
+  .image-upload-box p {
+    color: #777777;
+    font-size: 13px;
+  }
+
+
+  #productImages {
+    display: none;
+  }
+
+
+  .choose-images-btn {
+    display: inline-block;
+
+    margin-top: 10px;
+
+    padding: 11px 20px;
+
+    border-radius: 8px;
+
+    background: #111111;
+    color: #ffffff !important;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: 0.2s;
+  }
+
+
+  .choose-images-btn:hover {
+    background: #333333;
+  }
+
+
+  .file-count {
+    margin-top: 15px !important;
+  }
+
+
+  .preview-container {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 25px;
+  }
+
+
+  .preview-image {
+    width: 100%;
+    height: 110px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    border: 1px solid #dddddd;
+  }
+
+
+  .upload-progress-section {
+    display: none;
+
+    margin-bottom: 25px;
+  }
+
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #333333;
+  }
+
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+
+    background: #eeeeee;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+  }
+
+
+  #progressBar {
+    width: 0%;
+    height: 100%;
+
+    background: #111111;
+
+    border-radius: 10px;
+
+    transition: width 0.2s ease;
+  }
+
+
+  .add-product-btn {
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #111111;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+    position: relative;
+  }
+
+
+  .add-product-btn:hover {
+    background: #333333;
+  }
+
+
+  .add-product-btn:disabled {
+    background: #777777;
+    cursor: not-allowed;
+  }
+
+
+  .button-loader {
+    display: none;
+
+    width: 15px;
+    height: 15px;
+
+    margin-left: 8px;
+
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #ffffff;
+
+    border-radius: 50%;
+
+    animation: spin 0.7s linear infinite;
+  }
+
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+
+  @media (max-width: 600px) {
+
+    .add-product-card {
+      padding: 25px 20px;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .page-header h1 {
+      font-size: 25px;
+    }
+
+  }
+
+</style>
+
+<script>
+
+  const imageInput = document.getElementById("productImages");
+
+  const previewContainer =
+    document.getElementById("previewContainer");
+
+  const fileCount =
+    document.getElementById("fileCount");
+
+
+  /*
+   * Show selected images immediately
+   */
+  imageInput.addEventListener("change", function () {
+
+    previewContainer.innerHTML = "";
+
+    const files = Array.from(this.files);
+
+    if (files.length === 0) {
+
+      fileCount.textContent = "No images selected";
+
+      return;
+    }
+
+
+    fileCount.textContent =
+      files.length +
+      (files.length === 1 ? " image selected" : " images selected");
+
+
+    files.forEach(function (file) {
+
+      if (!file.type.startsWith("image/")) {
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function (event) {
+
+        const img = document.createElement("img");
+
+        img.src = event.target.result;
+
+        img.className = "preview-image";
+
+        previewContainer.appendChild(img);
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
+
+  });
+
+
+  /*
+   * Upload progress UI
+   *
+   * This represents the browser -> Rails request.
+   * Your Rails backend then uploads the images to Cloudinary.
+   */
+  const form = document.getElementById("productForm");
+
+  form.addEventListener("submit", function () {
+
+    const files = imageInput.files;
+
+    if (files.length === 0) {
+      return;
+    }
+
+
+    const progressSection =
+      document.getElementById("uploadProgressSection");
+
+    const progressBar =
+      document.getElementById("progressBar");
+
+    const percentage =
+      document.getElementById("uploadPercentage");
+
+    const status =
+      document.getElementById("uploadStatus");
+
+    const submitButton =
+      document.getElementById("submitButton");
+
+    const buttonText =
+      document.getElementById("buttonText");
+
+    const buttonLoader =
+      document.getElementById("buttonLoader");
+
+
+    progressSection.style.display = "block";
+
+    submitButton.disabled = true;
+
+    buttonText.textContent = "Uploading...";
+
+    buttonLoader.style.display = "inline-block";
+
+
+    /*
+     * Smooth visual progress while Rails processes
+     * the multipart request and Cloudinary uploads.
+     */
+    let progress = 0;
+
+    const interval = setInterval(function () {
+
+      if (progress < 90) {
+
+        progress += Math.random() * 8;
+
+        if (progress > 90) {
+          progress = 90;
+        }
+
+        progressBar.style.width = progress + "%";
+
+        percentage.textContent =
+          Math.floor(progress) + "%";
+
+      }
+
+    }, 300);
+
+
+    /*
+     * Once the browser submits the form, Rails takes over.
+     */
+    setTimeout(function () {
+
+      clearInterval(interval);
+
+      progressBar.style.width = "95%";
+
+      percentage.textContent = "95%";
+
+      status.textContent = "Saving product...";
+
+    }, 1000);
+
+  });
+
+</script>

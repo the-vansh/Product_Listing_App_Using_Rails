@@ -1,0 +1,125 @@
+<h1>Edit Product</h1>
+
+<%= form_with model: @product,
+              url: "/products/#{@product.id}",
+              method: :patch,
+              multipart: true,
+              data: { turbo: false } do |form| %>
+
+  <div>
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <br>
+
+  <div>
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
+
+  <br>
+
+  <div>
+    <%= form.label :price %>
+    <%= form.number_field :price, step: "0.01" %>
+  </div>
+
+  <br>
+
+  <div>
+    <%= form.label :quantity %>
+    <%= form.number_field :quantity %>
+  </div>
+
+  <hr>
+
+  <h3>Existing Images</h3>
+
+  <% if @product.product_images.any? %>
+
+    <% @product.product_images.each do |image| %>
+
+      <div id="image-<%= image.id %>">
+
+        <%= image_tag image.image_url, width: 200 %>
+
+        <br>
+
+        <button
+          type="button"
+          onclick="deleteImage(<%= image.id %>)">
+          Delete Image
+        </button>
+
+      </div>
+
+      <br>
+
+    <% end %>
+
+  <% else %>
+
+        <p>No images uploaded.</p>
+
+  <% end %>
+
+  <hr>
+
+  <h3>Add New Images</h3>
+
+  <%= form.file_field :images,
+      multiple: true,
+      accept: "image/*" %>
+
+  <br><br>
+
+  <%= form.submit "Update Product" %>
+
+<% end %>
+
+<script>
+  function deleteImage(imageId) {
+
+    const token = localStorage.getItem("token");
+
+    fetch(`/product_images/${imageId}`, {
+      method: "DELETE",
+
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    })
+    .then(response => {
+
+      if (!response.ok) {
+        return response.json().then(data => {
+          throw new Error(data.error || "Failed to delete image");
+        });
+      }
+
+      return response.json();
+
+    })
+    .then(data => {
+
+      if (data.success) {
+
+        const imageElement = document.getElementById(
+          `image-${imageId}`
+        );
+
+        if (imageElement) {
+          imageElement.remove();
+        }
+
+      }
+
+    })
+    .catch(error => {
+      console.error(error);
+      alert(error.message);
+    });
+  }
+</script>

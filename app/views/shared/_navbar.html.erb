@@ -1,0 +1,38 @@
+<nav class="navbar">
+
+  <!-- Logo / App Name -->
+
+  <div class="navbar-brand">
+    <%= link_to "Product Listing App", "/" %>
+  </div>
+
+  <div class="navbar-links">
+
+<% if current_user %>
+
+  <!-- Logged-in user -->
+
+  <%= link_to "Products", "/products" %>
+
+  <%= link_to "Add Product", "/products/addproduct" %>
+
+  <%= button_to "Logout",
+        "/logout",
+        method: :get,
+        class: "logout-btn" %>
+
+<% else %>
+
+  <!-- Guest user -->
+
+  <%= link_to "Home", "/" %>
+
+  <%= link_to "Login", "/login" %>
+
+  <%= link_to "Sign Up", "/signup" %>
+
+<% end %>
+
+  </div>
+
+</nav>

@@ -1,0 +1,182 @@
+<div class="products-page">
+
+  <div class="products-header">
+    <div>
+      <p class="products-label">PRODUCT LISTING</p>
+      <h1>Explore Products</h1>
+      <p class="products-subtitle">
+        Discover products listed by our community.
+      </p>
+    </div>
+  </div>
+
+  <div class="products-grid">
+
+
+<% @products.each do |product| %>
+
+  <div class="product-card" data-product-id="<%= product.id %>">
+
+    <!-- Image Section -->
+    <div class="product-card-image">
+
+      <% if product.product_images.any? %>
+
+        <div class="image-slider">
+
+          <% product.product_images.each_with_index do |image, index| %>
+
+            <img
+              src="<%= image.image_url %>"
+              class="product-image"
+              style="<%= index == 0 ? '' : 'display: none;' %>"
+              alt="<%= product.name %>"
+            >
+
+          <% end %>
+
+
+          <% if product.product_images.length > 1 %>
+
+            <button
+              type="button"
+              class="slider-button slider-prev"
+              onclick="previousImage(<%= product.id %>)">
+              &#10094;
+            </button>
+
+            <button
+              type="button"
+              class="slider-button slider-next"
+              onclick="nextImage(<%= product.id %>)">
+              &#10095;
+            </button>
+
+          <% end %>
+
+        </div>
+
+      <% else %>
+
+        <div class="no-product-image">
+          <span>No Image</span>
+        </div>
+
+      <% end %>
+
+    </div>
+
+
+    <!-- Product Information -->
+    <div class="product-card-content">
+
+      <h2>
+        <%= product.name %>
+      </h2>
+
+      <p class="product-description">
+        <%= product.description %>
+      </p>
+
+
+      <div class="product-meta">
+
+        <div>
+          <span class="meta-label">Price</span>
+          <span class="product-price">
+            ₹<%= product.price %>
+          </span>
+        </div>
+
+        <div class="quantity-box">
+          <span class="meta-label">Quantity</span>
+          <span class="quantity">
+            <%= product.quantity %>
+          </span>
+        </div>
+
+      </div>
+
+
+      <!-- Owner Actions -->
+      <% if current_user && current_user.id == product.user_id %>
+
+        <div class="product-card-actions">
+
+          <%= link_to "Edit",
+              "/products/#{product.id}/edit",
+              class: "edit-button" %>
+
+          <%= button_to "Delete",
+              "/products/#{product.id}",
+              method: :delete,
+              class: "delete-button",
+              data: { turbo_confirm: "Are you sure?" } %>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+<% end %>
+
+
+  </div>
+
+</div>
+
+<script>
+  const currentImages = {};
+
+  function getImages(productId) {
+    const product = document.querySelector(
+      `[data-product-id="${productId}"]`
+    );
+
+    return product.querySelectorAll(".product-image");
+  }
+
+  function showImage(productId, index) {
+
+    const images = getImages(productId);
+
+    if (images.length === 0) {
+      return;
+    }
+
+    if (index >= images.length) {
+      index = 0;
+    }
+
+    if (index < 0) {
+      index = images.length - 1;
+    }
+
+    images.forEach((image, i) => {
+      image.style.display = i === index ? "block" : "none";
+    });
+
+    currentImages[productId] = index;
+  }
+
+  function nextImage(productId) {
+
+    const images = getImages(productId);
+
+    const currentIndex = currentImages[productId] || 0;
+
+    showImage(productId, currentIndex + 1);
+  }
+
+  function previousImage(productId) {
+
+    const images = getImages(productId);
+
+    const currentIndex = currentImages[productId] || 0;
+
+    showImage(productId, currentIndex - 1);
+  }
+</script>
